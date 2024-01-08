@@ -1,0 +1,60 @@
+---
+- name: Deploy LAMPSTACK on EC2 Instance
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Start Apache
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Install MySQL Server
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Install MySQL client
+      apt:
+        name: mysql-client
+        state: present
+
+    - name: Ensure MySQL service is started
+      systemd:
+        name: mysql
+        enabled: yes
+        state: started
+
+    - name: Install PHP
+      apt:
+        name: php
+        state: present
+
+    - name: Install PHP module for Apache2
+      apt:
+        name: libapache2-mod-php
+        state: present
+
+    - name: Install PHP module for MySQL
+      apt:
+        name: php-mysql
+        state: present
+
+    - name: Testing the LAMP stack
+      copy:
+        dest: /var/www/html/info.php
+        owner: www-data
+        group: www-data
+        mode: '0644'
+        content: "<?php phpinfo(); ?>"
